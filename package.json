@@ -1,0 +1,31 @@
+{
+  "name": "tg-binance-bot",
+  "version": "1.0.0",
+  "description": "",
+  "main": "index.js",
+  "scripts": {
+    "build": "tsc",
+    "start": "node dist/index.js"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/xblurx/tg-binance-bot.git"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/xblurx/tg-binance-bot/issues"
+  },
+  "homepage": "https://github.com/xblurx/tg-binance-bot#readme",
+  "dependencies": {
+    "axios": "^0.26.1",
+    "dotenv": "^16.0.0",
+    "node-telegram-bot-api": "^0.56.0"
+  },
+  "devDependencies": {
+    "@types/node": "^17.0.21",
+    "@types/node-telegram-bot-api": "^0.56.0",
+    "prettier": "^2.6.0",
+    "typescript": "^4.6.2"
+  }
+}
