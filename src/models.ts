@@ -1,31 +1,25 @@
-enum EAsset {
+export enum EAsset {
     BTC = 'BTC',
 }
 
-enum EFiatUnit {
+export enum EFiatUnit {
     RUB = 'RUB',
     USD = 'USD',
 }
 
+type TFiatSymbol = '₽' | '$';
+
 export type TTradeMethodName = 'Tinkoff' | 'BANK' | 'SpecificBank';
 
-/*
- * Via which method you're going to pay/receive. Primarily bank info.
- */
-interface ITradeMethod {
-    payMethodId: string;
-    payType: TTradeMethodName;
-    identifier: TTradeMethodName;
-    tradeMethodName: string;
-    tradeMethodShortName: string;
+export interface ITicker {
+    ticker: string;
+    price: string;
 }
-
-type TFiatSymbol = '₽' | '$';
 
 /*
  * A search p2p response.
  */
-export interface IResponse {
+export interface IP2PResponse {
     code: string;
     data: IAdData[];
     message: string | null;
@@ -46,7 +40,14 @@ export interface IAdvertisement {
     asset: EAsset;
     fiatUnit: EFiatUnit;
     price: string;
-    tradeMethods: ITradeMethod[];
+    /* Methods you're going to pay/receive with. Primarily bank info. */
+    tradeMethods: Array<{
+        payMethodId: string;
+        payType: TTradeMethodName;
+        identifier: TTradeMethodName;
+        tradeMethodName: string;
+        tradeMethodShortName: string;
+    }>;
     fiatSymbol: TFiatSymbol;
     /* Current amount of fiat to buy */
     dynamicMaxSingleTransAmount: string;

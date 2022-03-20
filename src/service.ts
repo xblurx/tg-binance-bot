@@ -1,18 +1,16 @@
-import { getP2PData, getSymbolTicker } from './api';
+import { getP2PExchangeData, getSymbolTicker } from './api';
 
-export const getBTCInfoMessages = async () => {
+export const getBTCRateMessage = async (): Promise<string[]> => {
     const [ads, ticker] = await Promise.all([
-        getP2PData().then((data) => data.map((item) => item.adv)),
+        getP2PExchangeData().then((data) => data?.data.map((ad) => ad.adv)),
         getSymbolTicker('BTCUSDT'),
     ]);
 
-    const message: string[] | false =
-        !!ads &&
-        !!ticker.price &&
-        ads.map((cv) => {
-            const fiftyToCrypto = 50000 / parseFloat(cv.price);
-            const hundredToCrypto = 100000 / parseFloat(cv.price);
-            const btcUSD = parseFloat(ticker.price);
+    return !!ads && !!ticker.price
+        ? ads.map((cv) => {
+            const fiftyFiatToCrypto = 50000 / parseFloat(cv.price);
+            const hundredFiatToCrypto = 100000 / parseFloat(cv.price);
+            const usdtPerTicker = parseFloat(ticker.price);
 
             return `Current price: ${cv.price} ${cv.fiatUnit}/${
                 cv.asset
@@ -20,12 +18,11 @@ export const getBTCInfoMessages = async () => {
                 cv.fiatUnit
             }\nHas up to: ${cv.dynamicMaxSingleTransQuantity} ${
                 cv.asset
-            }\n50k rub: ${fiftyToCrypto} ${cv.asset}, ${
-                btcUSD * fiftyToCrypto
-            } USD\n100k rub: ${hundredToCrypto} ${cv.asset}, ${
-                btcUSD * hundredToCrypto
-            } USD`;
-        });
-
-    return message;
+            }\n50k rub: ${fiftyFiatToCrypto.toFixed(8)} ${cv.asset}, ${(
+                usdtPerTicker * fiftyFiatToCrypto
+            ).toFixed(2)} USD\n100k rub: ${hundredFiatToCrypto.toFixed(8)} ${
+                cv.asset
+            }, ${(usdtPerTicker * hundredFiatToCrypto).toFixed(2)} USD`;
+        })
+        : ['An error occurred'];
 };

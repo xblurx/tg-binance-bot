@@ -1,10 +1,21 @@
 import axios from 'axios';
-import { IResponse } from './Models';
+import {
+    EAsset,
+    EFiatUnit,
+    IP2PResponse,
+    ITicker,
+    TTradeMethodName,
+} from './models';
 
-interface ITicker {
-    ticker: string;
-    price: string;
-}
+axios.interceptors.response.use(
+    config => config,
+    (error) => {
+        if (error?.response.status === 408 || error.code === 'ECONNABORTED') {
+            console.log(`timeout, url: ${error.config.url}`)
+        }
+        throw error
+    },
+);
 
 export const getSymbolTicker = async (symbol: string): Promise<ITicker> => {
     const { data } = await axios.get<ITicker>(
@@ -16,35 +27,37 @@ export const getSymbolTicker = async (symbol: string): Promise<ITicker> => {
     return data;
 };
 
-export const getP2PData = async (
+export const getP2PExchangeData = async (
     page = 1,
-    fiat = 'RUB',
+    fiat = EFiatUnit.RUB,
     tradeType = 'BUY',
-    asset = 'BTC',
-    payTypes = ['BANK'],
+    asset = EAsset.BTC,
+    payTypes: TTradeMethodName[] = ['BANK'],
     transAmount = 50000
-) => {
-    const {
-        data,
-    } = await axios.post<IResponse>(
-        'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search',
-        {
-            page,
-            rows: 20,
-            publisherType: null,
-            asset,
-            tradeType,
-            fiat,
-            payTypes,
-            transAmount,
-        },
-        {
-            timeout: 10000,
-            headers: {
-                'Content-Type': 'application/json',
+): Promise<IP2PResponse | undefined> => {
+    try {
+        const { data } = await axios.post<IP2PResponse>(
+            'https://p2p.binance.com/bapi/c2c/v2/friendly/c2c/adv/search',
+            {
+                page,
+                rows: 3,
+                publisherType: null,
+                asset,
+                tradeType,
+                fiat,
+                payTypes,
+                transAmount,
             },
-        }
-    );
+            {
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+            }
+        );
 
-    return data.data
+        return data;
+    } catch (e) {
+        console.error(e);
+        return
+    }
 };
